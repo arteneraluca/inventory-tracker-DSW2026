@@ -165,3 +165,8 @@ Navigarea și actualizarea interfeței se realizează dinamic, fără reîncărc
 Inventory Tracker este o aplicație web modernă, dezvoltată conform principiilor actuale de inginerie software. Proiectul demonstrează utilizarea eficientă a React, TypeScript și Tailwind CSS, precum și aplicarea metodologiei Agile prin dezvoltare incrementală.
 
 Aplicația îndeplinește toate cerințele specificate în temă și poate fi extinsă cu funcționalități suplimentare, precum autentificare, import de date sau vizualizări grafice.
+
+---
+
+### Link aplicație:
+https://inventory-tracker-dsw-2026.vercel.app/
