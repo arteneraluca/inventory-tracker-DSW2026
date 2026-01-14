@@ -4,9 +4,10 @@ import { useState } from "react";
 import { useInventory } from "@/hooks/useInventory";
 import { validateName, validateSerial, validateValue } from "@/lib/validators";
 import { itemsToCSV, downloadCSV } from "@/lib/csv";
+import { parseInventoryJSON } from "@/lib/importJson";
 
 export default function Page() {
-  const { sortedItems, addItem, deleteItem, updateItem, toggleSort, totalValue, sort, query, setQuery, minValue, setMinValue, maxValue, setMaxValue, } = useInventory();
+  const { sortedItems, addItem, deleteItem, updateItem, toggleSort, totalValue, sort, query, setQuery, minValue, setMinValue, maxValue, setMaxValue, addMany } = useInventory();
 
   const [name, setName] = useState("");
   const [serial, setSerial] = useState("");
@@ -60,6 +61,25 @@ export default function Page() {
     setValue("");
     setError(null);
   }
+
+  async function onImportJSON(file: File) {
+    const text = await file.text();
+    const { items, errors } = parseInventoryJSON(text);
+
+    if (errors.length) {
+      setError(errors.slice(0, 3).join(" | ") + (errors.length > 3 ? ` (+${errors.length - 3} more)` : ""));
+      return;
+    }
+
+    if (items.length === 0) {
+      setError("No valid items found in JSON.");
+      return;
+    }
+
+    addMany(items);
+    setError(null);
+  }
+
 
   return (
     <main className="mx-auto max-w-5xl p-4 md:p-8 space-y-6">
@@ -131,6 +151,21 @@ export default function Page() {
           >
             Export CSV
           </button>
+
+          <label className="rounded-lg border px-4 py-2 w-fit cursor-pointer">
+            Import JSON
+            <input
+              type="file"
+              accept="application/json,.json"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) onImportJSON(f);
+                e.currentTarget.value = ""; // permitem re-import acelasi fisier
+              }}
+            />
+          </label>
+
 
           {hasActiveFilters && (
             <button

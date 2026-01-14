@@ -57,6 +57,27 @@ export function useInventory() {
         });
     }
 
+    function addMany(newItems: Array<{ name: string; serialNumber: string; value: number }>) {
+        const now = new Date().toISOString();
+
+        const mapped = newItems.map((x) => ({
+            id: crypto.randomUUID(),
+            name: x.name,
+            serialNumber: x.serialNumber,
+            value: x.value,
+            createdAt: now,
+            updatedAt: now,
+        }));
+
+        setItems((prev) => {
+            const existing = new Set(prev.map((p) => p.serialNumber.toLowerCase()));
+            const unique = mapped.filter((m) => !existing.has(m.serialNumber.toLowerCase()));
+            return [...unique, ...prev];
+        });
+
+    }
+
+
     const filteredSortedItems = useMemo(() => {
         const q = query.trim().toLowerCase();
 
@@ -92,5 +113,5 @@ export function useInventory() {
         [items]
     );
 
-    return { items, sortedItems: filteredSortedItems, sort, setSort, toggleSort, addItem, deleteItem, updateItem, totalValue, query, setQuery, minValue, setMinValue, maxValue, setMaxValue };
+    return { items, sortedItems: filteredSortedItems, sort, setSort, toggleSort, addItem, deleteItem, updateItem, addMany, totalValue, query, setQuery, minValue, setMinValue, maxValue, setMaxValue };
 }
