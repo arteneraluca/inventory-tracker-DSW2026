@@ -14,6 +14,8 @@ export default function Page() {
   const [value, setValue] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [highlightThreshold, setHighlightThreshold] = useState("500");
+
 
   const hasActiveFilters = query.trim() !== "" || minValue.trim() !== "" || maxValue.trim() !== "";
 
@@ -137,6 +139,13 @@ export default function Page() {
             value={maxValue}
             onChange={(e) => setMaxValue(e.target.value)}
           />
+          <input
+            className="border rounded-lg p-2"
+            placeholder="Highlight over..."
+            value={highlightThreshold}
+            onChange={(e) => setHighlightThreshold(e.target.value)}
+          />
+
         </div>
 
         <div className="text-sm text-gray-600">
@@ -201,31 +210,49 @@ export default function Page() {
             </tr>
           </thead>
           <tbody>
-            {sortedItems.map((x) => (
-              <tr key={x.id} className="border-t">
-                <td className="p-3">{x.name}</td>
-                <td className="p-3">{x.serialNumber}</td>
-                <td className="p-3">${x.value.toFixed(2)}</td>
-                <td className="p-3 text-right">
-                  <div className="inline-flex gap-3">
-                    <button className="text-blue-600" onClick={() => startEdit(x.id)}>
-                      Edit
-                    </button>
-                    <button
-                      className="text-red-600"
-                      onClick={() => {
-                        const ok = confirm(`Delete "${x.name}"?`);
-                        if (ok) deleteItem(x.id);
-                      }}
-                    >
-                      Delete
-                    </button>
+            {sortedItems.map((x) => {
+              const threshold = Number(highlightThreshold);
+              const isHigh = !Number.isNaN(threshold) && x.value > threshold;
 
-                  </div>
-                </td>
+              return (
+                <tr
+                  key={x.id}
+                  className={`border-t ${isHigh ? "bg-yellow-50" : ""}`}
+                >
+                  <td className={`p-3 ${isHigh ? "font-semibold" : ""}`}>{x.name}</td>
 
-              </tr>
-            ))}
+                  <td className="p-3">{x.serialNumber}</td>
+
+                  <td className={`p-3 ${isHigh ? "text-yellow-800 font-semibold" : ""}`}>
+                    ${x.value.toFixed(2)}
+                    {isHigh && (
+                      <span className="ml-2 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-yellow-900">
+                        High
+                      </span>
+                    )}
+                  </td>
+
+                  <td className="p-3 text-right">
+                    <div className="inline-flex gap-3">
+                      <button className="text-blue-600" onClick={() => startEdit(x.id)}>
+                        Edit
+                      </button>
+
+                      <button
+                        className="text-red-600"
+                        onClick={() => {
+                          const ok = confirm(`Delete "${x.name}"?`);
+                          if (ok) deleteItem(x.id);
+                        }}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+
             {sortedItems.length === 0 && (
               <tr>
                 <td className="p-6 text-gray-500" colSpan={4}>

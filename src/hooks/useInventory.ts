@@ -109,9 +109,10 @@ export function useInventory() {
 
 
     const totalValue = useMemo(
-        () => items.reduce((sum, x) => sum + x.value, 0),
-        [items]
+        () => filteredSortedItems.reduce((sum, x) => sum + x.value, 0),
+        [filteredSortedItems]
     );
+
 
     return { items, sortedItems: filteredSortedItems, sort, setSort, toggleSort, addItem, deleteItem, updateItem, addMany, totalValue, query, setQuery, minValue, setMinValue, maxValue, setMaxValue };
 }
